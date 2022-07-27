@@ -1,0 +1,961 @@
+<!DOCTYPE html>
+<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bai+Jamjuree:wght@300&display=swap" rel="stylesheet">
+<head>
+    <style>
+    html,body,h1,h2,h3,h4,h5 {font-family: 'Bai Jamjuree', sans-serif}
+    .dropdown-content { display: none; position: absolute; background-color: #f1f1f1; min-width: 16px; box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2); z-index: 1; }
+    .dropdown-content a { color: black; padding: 8px 8px; text-decoration: none; display: block; }
+    .dropdown-content a:hover {background-color: #ddd}
+    
+    .tooltip { position: relative; display: inline-block; border-bottom: 1px dotted black; }
+    .tooltip .tooltiptext { visibility: hidden; width: 120px; background-color: black; color: #fff; text-align: center; border-radius: 6px; padding: 8px; position: absolute; z-index: 1; bottom: 150%; left: 50%; margin-left: -60px; }
+    .tooltip .tooltiptext::after { content: ""; position: absolute; top: 100%; left: 50%; margin-left: -5px; border-width: 5px; border-style: solid; border-color: black transparent transparent transparent; }
+    .tooltip:hover .tooltiptext { visibility: visible; }
+    
+    table, td, th { border: 1px solid; }
+    table { text-align: center; border-collapse: collapse; }
+    tr:first-child td { background-color: #e1e1e1; }
+    td { width: 30px; }
+    td:first-child { width: 100px; }
+
+    </style>
+</head>
+<body class="w3-container w3-padding-24">
+
+    <div id="page_disp" style="display: nonee;">
+
+        <!-- Header -->
+        <div class="w3-container">
+            <h1 style="margin: 0;">โปรแกรมจัดเวร</h1>
+            <div style="font-size: small;" id="soft_ver"></div>
+            <div style="margin-bottom: 50px; font-size: small;">© 2022 TANPITCH</div>
+        </div>
+
+        <!-- Data area -->
+        <!-- Header -->
+        <div class="w3-bar">
+            <div class="w3-bar-item" style="width: 100px;">รายชื่อ</div>
+            <div class="w3-bar-item" style="width: 40px;padding: 8px 4px; text-align: center;" id="table_date_0">31</div>
+            <div id="gen_date"></div>
+        </div>
+        <!-- User lists -->
+        <div id="gen_user"></div>
+
+        <hr />
+
+        <!-- Setting -->
+        <div class="w3-container">
+            
+            <div class="w3-row" style="margin: 8px 0px;">
+                <div class="tooltip">
+                    <input type="button" value="จัดเวร" class="w3-button w3-green" style="width: 100px;" onclick="main_process()" />
+                    <span class="tooltiptext">โปรแกรมจัดเวรให้</span>
+                </div>
+                <div class="tooltip">
+                    <input type="button" value="ล้างจัดเวร" class="w3-button w3-light-grey" style="width: 100px;" onclick="clear_compute()" />
+                    <span class="tooltiptext">ลบข้อมูลที่โปรแกรมจัดเวร</span>
+                </div>
+                <div class="tooltip">
+                    <input type="button" value="ล้างทั้งหมด" class="w3-button w3-light-grey" style="width: 100px;" onclick="document.getElementById('id06').style.display='block'" />
+                    <span class="tooltiptext">ลบข้อมูลการจัดเวรทั้งหมด</span>
+                </div>
+                <div class="tooltip" style=" margin-left: 50px;">
+                    <input type="button" value="เครื่องมือช่วยจัดเวร" class="w3-button w3-light-grey" style="width: 200px;" onclick="document.getElementById('id07').style.display='block'" />
+                    <span class="tooltiptext">เครื่องมือช่วยในการจัดเวร</span>
+                </div>
+                
+            </div>
+            <div class="w3-row" style="margin: 8px 0px;">
+                <div class="tooltip">
+                    <input type="button" value="บันทึก" class="w3-button w3-light-grey" style="width: 100px;" onclick="save_file()" />
+                    <span class="tooltiptext">บันทึกตารางเวร</span>
+                </div>
+                <div class="tooltip">
+                    <input type="button" value="เปิด" class="w3-button w3-light-grey" style="width: 100px;" onclick="open_file()" />
+                    <span class="tooltiptext">นำเข้าตารางเวร</span>
+                </div>
+                <div class="tooltip">
+                    <input type="button" value="พิมพ์" class="w3-button w3-light-grey" style="width: 100px;" onclick="print_file()" />
+                    <span class="tooltiptext">พิมพ์ตารางเวร</span>
+                </div>
+                <div class="tooltip" style=" margin-left: 50px;">
+                    <input type="button" value="รวมจำนวนเวร" class="w3-button w3-light-grey" style="width: 200px;" onclick="document.getElementById('id08').style.display='block';gen_total_shift()" />
+                    <span class="tooltiptext">แสดงจำนวนเวรของแต่ละคน</span>
+                </div>
+            </div>
+            <div class="w3-row" style="margin: 50px 0px;">
+                <div class="tooltip">
+                    <input type="button" value="ตั้งค่า" class="w3-button w3-light-grey" style="width: 100px;" onclick="document.getElementById('id05').style.display='block'" />
+                    <span class="tooltiptext">ตั้งค่าทั่วไป</span>
+                </div>
+                <div class="tooltip">
+                    <input type="button" value="ตารางใหม่" class="w3-button w3-red" style="width: 200px;" onclick="document.getElementById('id04').style.display='block'" />
+                    <span class="tooltiptext">ตั้งค่าวันที่ คน ใหม่ทั้งหมด</span>
+                </div>
+            </div>
+            
+        </div>
+            
+    </div>
+    <div id="page_print" style="display: none;" onclick="document.getElementById(this.id).style.display='none';document.getElementById('page_disp').style.display='block'"></div>
+
+
+    <!-- People shift setting : Modal -->
+    <div id="id01" class="w3-modal">
+        <div class="w3-modal-content" style="width: 500px; height: 180px;">
+          <header class="w3-container" style="background-color: pink;"> 
+            <h3 style="margin: 0;" onclick="document.getElementById('id01').style.display='none'" 
+            class="w3-button w3-display-topright">&times;</h3>
+            <h2>จำนวนคนต่อเวร : <label id="disp_date">31</label></h2>
+          </header>
+          <div class="w3-container w3-margin">
+            <span style="display: inline-block; width: 60px; margin: 8px;"> เวรเช้า : </span><input type="number" min="1" max="7" value="4" style="margin-right: 20px;" id="disp_total_day" />
+            <span style="display: inline-block; width: 60px; margin: 8px;"> เวรบ่าย : </span><input type="number" min="1" max="7" value="3" style="margin-right: 20px;" id="disp_total_even" />
+            <span style="display: inline-block; width: 60px; margin: 8px;"> เวรดึก : </span><input type="number" min="1" max="7" value="3" id="disp_total_night" />
+          </div>
+          <div class="w3-container w3-margin w3-center">
+            <input type="button" value="บันทึก" onclick="set_total();document.getElementById('id01').style.display='none'" />
+            <input type="button" value="ยกเลิก" onclick="document.getElementById('id01').style.display='none'" />
+          </div>
+        </div>
+    </div>
+
+    <!-- Alert to Main setting : Modal -->
+    <div id="id04" class="w3-modal">
+        <div class="w3-modal-content" style="width: 500px; height: 200px;">
+            <header class="w3-container" style="background-color: #cbf5ff;">
+                <h2>แจ้งเตือน</h2>
+                <h3 style="margin: 0;" onclick="document.getElementById('id04').style.display='none';" class="w3-button w3-display-topright">&times;</h3>
+            </header>
+                <div class="w3-container w3-margin w3-center">
+                <h2>ตั้งค่าใหม่ ข้อมูลจะหายทั้งหมด</h2>
+                <input type="button" value="ตกลง" class="w3-button w3-red" onclick="document.getElementById('id04').style.display='none';document.getElementById('id02').style.display='block'" />
+                <input type="button" value="ยกเลิก" class="w3-button w3-light-grey" onclick="document.getElementById('id04').style.display='none'" />
+            </div>
+        </div>
+    </div>
+
+    <!-- Main setting : Modal -->
+    <div id="id02" class="w3-modal">
+        <div class="w3-modal-content" style="width: 500px; height: 440px;">
+            <header class="w3-container" style="background-color: #cbf5ff;">
+                <h2>ตั้งค่าก่อนจัดเวร</h2>
+            </header>
+            <div class="w3-container w3-border w3-padding-16 w3-margin">
+                <h4>จำนวนคนทั้งหมด</h4>
+                <span style="display: inline-block; width: 110px; margin: 8px;"> คนทั้งหมด : </span><input type="number" min="1" max="20" value="10" id="total_peep" />
+            </div>
+            <div class="w3-container w3-border w3-padding-16 w3-margin">
+                <h4>จำนวนวัน</h4>
+                <div class="w3-half">
+                    <span style="display: inline-block; width: 110px; margin: 8px;"> วันแรก เป็นวัน : </span>
+                        <select id="sunday_date"><option value="7">วันจันทร์</option><option value="6">วันอังคาร</option><option value="5">วันพุธ</option><option value="4">วันพฤหัส</option><option value="3">วันศุกร์</option><option value="2">วันเสาร์</option><option value="1">วันอาทิตย์</option></select><br />
+                </div>
+                <div class="w3-half" style="padding-left: 30px;">
+                    <span style="display: inline-block; width: 60px; margin: 8px;"> เดือนนีัมี : </span><select id="total_date"><option>28</option><option>29</option><option>30</option><option selected>31</option></select> วัน
+                </div>
+                <span style="display: inline-block; width: 110px; margin: 8px;"> วันหยุด วันที่ :   </span><input type="text" style="width: 190px;" id="holiday_date" placeholder="วันที่ ตามด้วย, เช่น 3,4"/><br />
+            </div>
+            <div class="w3-container w3-margin w3-center">
+                <input type="button" value="ตกลง" onclick="update();document.getElementById('id02').style.display='none';document.getElementById('id05').style.display='block'" />
+            </div>
+        </div>
+    </div>
+
+    <!-- Intro page : Modal -->
+    <div id="id03" class="w3-modal" style="display: block;">
+        <div class="w3-modal-content" style="width: 500px;">
+            <header class="w3-container" style="background-color: #cbf5ff;">
+                <h3 style="margin: 0;" onclick="document.getElementById('id03').style.display='none';document.getElementById('id02').style.display='block'" class="w3-button w3-display-topright">&times;</h3>
+                <h1>โปรแกรมจัดเวร</h1>
+            </header>
+            <div class="w3-container">
+                <h4 id="home_ver"></h4>
+                <li id="home_date"></li>
+                <li>many bugs fixed</li>
+                <li>some features may not working</li>
+            </div>
+            <div class="w3-container" style="font-size: 8pt;">
+                <p>© 2022 TANPITCH</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Additional setting : Modal -->
+    <div id="id05" class="w3-modal">
+        <div class="w3-modal-content" style="width: 500px; padding-bottom: 8px;">
+            <header class="w3-container" style="background-color: #cbf5ff;">
+                <h2>ตั้งค่า</h2>
+            </header>
+            <div class="w3-container w3-border w3-padding-16 w3-margin" style="display: none;">
+                <h4>จำนวนคนต่อเวร</h4>
+                <div class="w3-half">
+                    <span style="display: inline-block; width: 110px; margin: 8px;"> วันปกติ เวรเช้า : </span><input type="number" min="1" max="7" value="4" id="total_norm_day" /><br />
+                    <span style="display: inline-block; width: 110px; margin: 8px;"> วันปกติ เวรบ่าย : </span><input type="number" min="1" max="7" value="3" id="total_norm_even" /><br />
+                    <span style="display: inline-block; width: 110px; margin: 8px;"> วันปกติ เวรดึก : </span><input type="number" min="1" max="7" value="3" id="total_norm_night" /><br />
+                </div>
+                <div class="w3-half">
+                    <span style="display: inline-block; width: 110px; margin: 8px;"> วันหยุด เวรเช้า : </span><input type="number" min="1" max="7" value="3" id="total_special_day" /><br />
+                    <span style="display: inline-block; width: 110px; margin: 8px;"> วันหยุด เวรบ่าย : </span><input type="number" min="1" max="7" value="3" id="total_special_even" /><br />
+                    <span style="display: inline-block; width: 110px; margin: 8px;"> วันหยุด เวรดึก : </span><input type="number" min="1" max="7" value="3" id="total_special_night" /><br />
+                </div>
+            </div>
+            <div class="w3-container w3-border w3-padding-16 w3-margin">
+                <h4>ชื่อตารางเวร</h4>
+                <input id="table_name" style="margin-top: 8px;" type="text" value="ตารางเวร" />
+            </div>
+            <div class="w3-container w3-border w3-padding-16 w3-margin">
+                <h4>ไม่จัดเวรเพิ่ม</h4>
+                <span>เปลี่ยนชื่อในช่อง เลือกหลังชื่อ จะไม่จัดเวรเพิ่มให้</span>
+                <div id="gen_user_setting" style="margin-top: 16px;"></div>
+            </div>
+            <div class="w3-container w3-margin w3-center">
+                <input type="button" value="ตกลง" onclick="document.getElementById('id05').style.display='none';minor_setting();" />
+            </div>
+        </div>
+    </div>
+
+    <!-- Alert : Modal -->
+    <div id="id00" class="w3-modal">
+        <div class="w3-modal-content" style="width: 500px; padding-bottom: 8px;">
+            <header class="w3-container" style="background-color: pink;">
+                <h2>แจ้งเตือน</h2>
+            </header>
+            <div class="w3-container w3-margin">
+                <h4 id="alert_txt">_display_txt_</h4>
+            </div>
+            <div class="w3-container w3-margin w3-center">
+                <input type="button" value="ตกลง" onclick="document.getElementById('id00').style.display='none'" />
+            </div>
+        </div>
+    </div>
+
+    <!-- Alert to Clear all data : Modal -->
+    <div id="id06" class="w3-modal">
+        <div class="w3-modal-content" style="width: 500px; height: 200px;">
+            <header class="w3-container" style="background-color: #cbf5ff;">
+                <h2>แจ้งเตือน</h2>
+                <h3 style="margin: 0;" onclick="document.getElementById('id06').style.display='none';" class="w3-button w3-display-topright">&times;</h3>
+            </header>
+            <div class="w3-container w3-margin w3-center">
+            <h2>ล้างทั้งหมด ข้อมูลจะหายทั้งหมด</h2>
+            <input type="button" value="ตกลง" class="w3-button w3-red" onclick="document.getElementById('id06').style.display='none';clear_all();" />
+            <input type="button" value="ยกเลิก" class="w3-button w3-light-grey" onclick="document.getElementById('id06').style.display='none'" />
+            </div>
+        </div>
+    </div>
+
+    <!-- Sum all shift data : Modal -->
+    <div id="id08" class="w3-modal">
+        <div class="w3-modal-content" style="width: 500px; padding-bottom: 10px;">
+            <header class="w3-container" style="background-color: pink;">
+                <h2>รวมจำนวนเวร</h2>
+                <h3 style="margin: 0;" onclick="document.getElementById('id08').style.display='none';" class="w3-button w3-display-topright">&times;</h3>
+            </header>
+            <div class="w3-container w3-margin w3-center" id="disp_total_shift">
+            </div>
+        </div>
+    </div>
+
+    <!-- Tools : Modal -->
+    <div id="id07" class="w3-modal">
+        <div class="w3-modal-content" style="width: 500px; padding-bottom: 10px;">
+            <header class="w3-container" style="background-color: #cbf5ff;">
+                <h2>เครื่องมือ</h2>
+                <h3 style="margin: 0;" onclick="document.getElementById('id07').style.display='none';" class="w3-button w3-display-topright">&times;</h3>
+            </header>
+            <div class="w3-container w3-margin w3-center">
+                <select style="width: 100px;" id="gen_sel_user"></select>
+                <select style="width: 100px;" id="sel_shift"><option value="0">ได้ทั้งหมด</option><option value="1">ลา</option><option value="2">อยู่ เวรเช้า</option><option value="3">อยู่ เวรบ่าย</option><option value="4">อยู่ เวรดึก</option><option value="5">อยู่ ช/บ</option><option value="6">อยู่ บ/ด</option><option value="7">อยู่ ช/ด</option><option value="8">อยู่ ช/บ/ด</option></select>
+
+                <select style="width: 100px; margin-bottom: 20px;" id="sel_date"><option value="0">ทุกวัน</option><option value="1">วันธรรมดา</option><option value="2">วันหยุด</option></select>
+
+                <br />
+
+                <input type="button" value="ตกลง" class="w3-button w3-light-grey" onclick="document.getElementById('id07').style.display='none';tools_data()" />
+                <input type="button" value="ยกเลิก" class="w3-button w3-light-grey" onclick="document.getElementById('id07').style.display='none'" />
+            </div>
+        </div>
+    </div>
+
+    <script>
+        var software_version = '1.1';
+        var software_date = '24/07/22';
+
+        var total_peep = 10;
+        var total_date = 31;
+
+        var total_peep_perday = [433, 433, 433, 433, 433, 333, 333, 433, 433, 433, 433, 433, 333, 333, 433, 433, 433, 433, 433, 333, 333, 433, 433, 433, 433, 433, 333, 333, 433, 433, 433];
+
+        var isHoliday = []; 
+        var isOriginal = [];
+        var isMenuOpen = false; var lastMenuOpen = '';
+
+        // Display software version
+        document.getElementById('soft_ver').innerHTML = 'software release version ' + software_version;
+        document.getElementById('home_ver').innerHTML = 'Release note ' + software_version;
+        document.getElementById('home_date').innerHTML = 'Build date ' + software_date;
+
+        // responsive width
+        var date_width = 0;
+        function calWidth() {
+            date_width = ((document.documentElement.clientWidth - 134)/(total_date + 1));
+            document.getElementById('table_date_0').style.width = date_width + 'px';
+        }
+        
+        // TEST:
+        //update();
+
+        function do_Nothing () {}
+
+        // Alert
+        function alert_pop(txt) {
+            document.getElementById('alert_txt').innerHTML = txt;
+            document.getElementById('id00').style.display = 'block';
+        }
+
+        // Update all config
+        function update() {
+            total_peep = Number(document.getElementById("total_peep").value);
+            total_date = Number(document.getElementById("total_date").value);
+            isHoliday = []; 
+            isOriginal = [];
+
+            // Responsive width
+            calWidth();
+
+            // Generate
+            table_generate();
+
+            // Coloring
+            date_highlight();
+        }
+
+        // Setting generate
+        function select_generate() {
+
+            // Clean previous data
+            const gen_user_selection = document.querySelector('#gen_sel_user');
+            removeAllChildNodes(gen_user_selection);
+
+            // User setting
+            for (let j=1; j<=total_peep; j++) {
+                var opt = document.createElement('option');
+                opt.value = j;
+                opt.innerHTML = document.getElementById('disp_user_' + j).textContent;
+                document.getElementById("gen_sel_user").appendChild(opt);
+            }
+        }
+        
+        // Table generate
+        function table_generate() {
+        
+            // Clean data
+            const clean_gen_date = document.querySelector('#gen_date');
+            const clean_gen_user = document.querySelector('#gen_user');
+            const gen_user_setting = document.querySelector('#gen_user_setting');
+            removeAllChildNodes(clean_gen_date);
+            removeAllChildNodes(clean_gen_user);
+            removeAllChildNodes(gen_user_setting);
+
+            // Header
+            for (let i=1; i<=total_date; i++) {
+                document.getElementById("gen_date").innerHTML += '<div class="w3-bar-item w3-hover-black" style="width: ' + date_width + 'px;padding: 8px 4px; text-align: center;" id="table_date_' + i + '" onclick="peep_set(' + i + ')">' + i + '</div>';
+            }
+            
+            // User
+            for (let k=1; k<=total_peep; k++) {
+                let temp_row = '<div class="w3-bar"';
+                if (k%2 == 1) temp_row += ' style="background-color: #f1f1f1;"';
+                temp_row += '><div class="w3-bar-item w3-hover-black" style="padding: 8px" onclick="document.getElementById(\'id05\').style.display=\'block\'"><label id="disp_user_' + k + '" style="display: block; width: 84px;">User ' + k + '<label/></div><div id="gen_user_' + k + '"></div></div>';
+                document.getElementById("gen_user").innerHTML += temp_row;
+            }
+            for (let j=1; j<=total_peep; j++) {
+                document.getElementById("gen_user_" + j).innerHTML += '<div class="w3-bar-item w3-hover-black" style="width: '+ date_width +'px; height: 44.5px; padding: 12px 4px; text-align: center; vertical-align: middle;" id="date_' + j + '_0" onclick="toggle_shift_menu(' + j + ', 0)"><label id="disp_' + j + '_0">x</label><div class="dropdown"><div id="shift_menu_' + j + '_0" class="dropdown-content"><a onclick="select_shift(' + j + ', 0, 1)">ลา</a><a onclick="select_shift(' + j + ', 0, 2)">ช</a><a onclick="select_shift(' + j + ', 0, 3)">บ</a><a onclick="select_shift(' + j + ', 0, 4)">ด</a><a onclick="select_shift(' + j + ', 0, 5)">ช/บ</a><a onclick="select_shift(' + j + ', 0, 6)">บ/ด</a><a onclick="select_shift(' + j + ', 0, 7)">ช/ด</a><a onclick="select_shift(' + j + ', 0, 8)">ช/บ/ด</a></div></div></div>';
+                for (let i=1; i<=total_date; i++) {
+                    document.getElementById("gen_user_" + j).innerHTML += '<div class="w3-bar-item w3-hover-black" style="width: '+ date_width +'px; height: 44.5px; padding: 12px 4px; text-align: center; vertical-align: middle;" id="date_' + j + '_' + i + '" onclick="toggle_shift_menu(' + j + ', ' + i + ')"><label id="disp_' + j + '_' + i + '"></label><div class="dropdown"><div id="shift_menu_' + j + '_' + i + '" class="dropdown-content"><a onclick="select_shift(' + j + ', ' + i + ', 0)">ได้ทั้งหมด</a><a onclick="select_shift(' + j + ', ' + i + ', 1)">ลา</a><a onclick="select_shift(' + j + ', ' + i + ', 2)">ช</a><a onclick="select_shift(' + j + ', ' + i + ', 3)">บ</a><a onclick="select_shift(' + j + ', ' + i + ', 4)">ด</a><a onclick="select_shift(' + j + ', ' + i + ', 5)">ช/บ</a><a onclick="select_shift(' + j + ', ' + i + ', 6)">บ/ด</a><a onclick="select_shift(' + j + ', ' + i + ', 7)">ช/ด</a><a onclick="select_shift(' + j + ', ' + i + ', 8)">ช/บ/ด</a></div></div></div>';
+                }
+            }
+
+            // User setting
+            for (let j=1; j<=total_peep; j++) {
+                document.getElementById("gen_user_setting").innerHTML += '<div class="w3-third"><input style="width: 100px; margin: 4px 8px;" value="User ' + j + '" onchange="setValue(this.value, \'disp_user_' + j + '\')"/><input type="checkbox" id="userCheck_' + j + '"></div>';
+            }
+            select_generate();
+        }
+
+        // Clear all highlight
+        function clear_highlight() {
+            for (let i=0; i<total_date+1; i++) {
+                document.getElementById("table_date_" + i).style.backgroundColor = "white";
+                for (let j=1; j<total_peep+1; j++) {
+                    if (j%2 == 1) document.getElementById("date_" + j + "_" + i).style.backgroundColor = "#f1f1f1";
+                    else document.getElementById("date_" + j + "_" + i).style.backgroundColor = "white";
+                }
+            }
+        }
+
+        // Highlight the holiday
+        function date_highlight() {
+            clear_highlight();
+            isHoliday = [];
+
+            let sunday_num = document.getElementById("sunday_date").value;
+            let store_sunday = [0, 7, 14, 21, 28];
+            for (let i=0; i<5; i++) {
+                let cal_sunday = Number(store_sunday[i]) + Number(sunday_num);
+
+                // find sunday
+                isHoliday.push(cal_sunday);
+
+                // find saturday
+                isHoliday.push(cal_sunday - 1);
+            }
+            if (sunday_num == 7) {
+                document.getElementById("table_date_0").style.backgroundColor = "pink";
+                for (let j=1; j<total_peep+1; j++) {
+                    document.getElementById("date_" + j + "_" + "0").style.backgroundColor = "#e9d6d9";
+                }
+            }
+
+            // addition holiday
+            let read_txt = document.getElementById("holiday_date").value;
+            read_txt = read_txt.replace(/\s/g, "");
+            let txt_split = read_txt.split(",");
+            if (txt_split != "") {
+                for (let i=0; i<txt_split.length; i++) {
+                    if (Number(txt_split[i]) < (total_date + 1)) {
+                        isHoliday.push(Number(txt_split[i]));
+                        document.getElementById("table_date_" + txt_split[i]).style.backgroundColor = "pink";
+                        for (let j=1; j<total_peep+1; j++) {
+                            document.getElementById("date_" + j + "_" + txt_split[i]).style.backgroundColor = "#e9d6d9";
+                        }
+                    }
+                }
+            }
+
+            isHoliday.sort(function(a, b) { return a - b; });
+            let tempHoli = isHoliday.filter(function(day) { return day <= total_date; });
+            isHoliday = tempHoli;
+            
+            // highlight
+            for (let i=0; i<total_peep_perday.length; i++) total_peep_perday[i] = 433;
+            for (let i=0; i<isHoliday.length; i++) {
+                let temp_date = isHoliday[i];
+                document.getElementById("table_date_" + temp_date).style.backgroundColor = "pink";
+                for (let j=1; j<total_peep+1; j++) {
+                    document.getElementById("date_" + j + "_" + temp_date).style.backgroundColor = "#e9d6d9";
+                }
+                
+                // change require peep for holiday
+                total_peep_perday[temp_date-1] = 333;
+            }
+        
+        }
+    
+        // Set people per shift
+        function peep_set(block_num) {
+
+            // load data
+            document.getElementById("disp_total_day").value = deShift(total_peep_perday[block_num-1], 'D');
+            document.getElementById("disp_total_even").value = deShift(total_peep_perday[block_num-1], 'E');
+            document.getElementById("disp_total_night").value = deShift(total_peep_perday[block_num-1], 'N');
+
+            // display modal
+            document.getElementById('disp_date').innerHTML = block_num;
+            document.getElementById('id01').style.display='block';
+        }
+        function set_total() {
+            let block_num = document.getElementById('disp_date').textContent - 1;
+            total_peep_perday[block_num] = enShift(document.getElementById('disp_total_day').value, document.getElementById('disp_total_even').value, document.getElementById('disp_total_night').value);
+        }
+
+        // Toggle shift menu
+        function toggle_shift_menu(peep, date) {
+            let temp_shift_menu = document.getElementById("shift_menu_" + peep + "_" + date);
+            if (!isMenuOpen) {
+                lastMenuOpen = peep + "_" + date;
+                temp_shift_menu.style.display = 'block';
+                isMenuOpen = true;
+            } else {
+                if (peep == Number(lastMenuOpen.split('_')[0]) && date == Number(lastMenuOpen.split('_')[1])) {
+                    temp_shift_menu.style.display = 'none';
+                    isMenuOpen = false;
+                } else {
+                    document.getElementById("shift_menu_" + Number(lastMenuOpen.split('_')[0]) + "_" + Number(lastMenuOpen.split('_')[1])).style.display = 'none';
+                    temp_shift_menu.style.display = 'block';
+                    lastMenuOpen = peep + "_" + date;
+                }
+            }
+            
+            //if (temp_shift_menu.style.display == 'block') temp_shift_menu.style.display = 'none';
+            //else temp_shift_menu.style.display = 'block';
+        }
+
+        // Select shift
+        function select_shift(peep, date, choice) {
+            let temp_disp = document.getElementById('disp_' + peep + '_' + date);
+            switch (choice) {
+                case 0: temp_disp.innerHTML = '';   break;
+                case 1: temp_disp.innerHTML = 'x';  break;
+                case 2: temp_disp.innerHTML = 'ช';  break;
+                case 3: temp_disp.innerHTML = 'บ';  break;
+                case 4: temp_disp.innerHTML = 'ด';  break;
+                case 5: temp_disp.innerHTML = 'ช/บ';  break;
+                case 6: temp_disp.innerHTML = 'บ/ด';  break;
+                case 7: temp_disp.innerHTML = 'ช/ด';  break;
+                case 8: temp_disp.innerHTML = 'All';  break;
+
+            }
+            let temp_txt = peep + '_'+ date;
+            if (!isOriginal.includes(temp_txt) && choice != 0 && date != 0) isOriginal.push(temp_txt);
+            if (isOriginal.includes(temp_txt) && choice == 0 && date != 0) isOriginal.splice(isOriginal.indexOf(temp_txt), 1);
+        }
+
+        // Remove All child
+        function removeAllChildNodes(parent) {
+            while (parent.firstChild) {
+                parent.removeChild(parent.firstChild);
+            }
+        }
+
+        // Change value
+        function setValue(val, toObj) {
+            document.getElementById(toObj).innerHTML = val;
+        }
+
+        // Shift to number - Number to shift
+        function shiftNum(txt) {
+            let shift_num = 0;
+            if (txt == '') shift_num = 0;
+            else if (txt == 'x') shift_num = 1;
+            else if (txt == 'ช') shift_num = 2;
+            else if (txt == 'บ') shift_num = 3;
+            else if (txt == 'ด') shift_num = 4;
+            else if (txt == 'ช/บ') shift_num = 5;
+            else if (txt == 'บ/ด') shift_num = 6;
+            else if (txt == 'ช/ด') shift_num = 7;
+            else if (txt == 'All') shift_num = 8;
+
+            return shift_num;
+        }
+        function numShift(num) {
+            let shift_txt = 0;
+            if (num == 0) shift_txt = '';
+            else if (num == 1) shift_txt = 'x';
+            else if (num == 2) shift_txt = 'ช';
+            else if (num == 3) shift_txt = 'บ';
+            else if (num == 4) shift_txt = 'ด';
+            else if (num == 5) shift_txt = 'ช/บ';
+            else if (num == 6) shift_txt = 'บ/ด';
+            else if (num == 7) shift_txt = 'ช/ด';
+            else if (num == 8) shift_txt = 'All';
+
+            return shift_txt;
+        }
+
+        // Decode-Encode total people in each shift
+        function deShift(val, shift) {
+            let shift_num = 0;
+            if (shift == 'D') shift_num = Math.floor(val/100);
+            else if (shift == 'E') shift_num = Math.floor((val - 100*(Math.floor(val/100)))/10);
+            else if (shift == 'N') shift_num = val%10;
+            return shift_num;
+        }
+        function enShift(valD, valE, valN) {
+            return Number(100 * valD) + Number(10 * valE) + Number(valN);
+        }
+
+        // Processing
+        function main_process() {
+            
+            let isCrash = false;
+
+            // for each day
+            for (let current_date=1; current_date<=total_date; current_date++) {
+
+                // check previous night shift
+                let night_shift = [];
+                for (let i=1; i<=total_peep; i++) {
+                    let temp_shiftNum = shiftNum(document.getElementById("disp_" + i + "_" + (current_date-1)).textContent);
+                    if (temp_shiftNum == 4 || temp_shiftNum == 6 || temp_shiftNum == 7 || temp_shiftNum == 8) night_shift.push(1);
+                    else night_shift.push(0);
+                }
+
+                // read user added peep per shift
+                let pre_peep_day = 0;
+                let pre_peep_even = 0;
+                let pre_peep_night = 0;            
+                for (let i=1; i<=total_peep; i++) {
+                    let temp_shiftNum = shiftNum(document.getElementById("disp_" + i + "_" + current_date).textContent);
+                    if (temp_shiftNum == 2 || temp_shiftNum == 5 || temp_shiftNum == 7 || temp_shiftNum == 8) pre_peep_day++;
+                    if (temp_shiftNum == 3 || temp_shiftNum == 5 || temp_shiftNum == 6 || temp_shiftNum == 8) pre_peep_even++;
+                    if (temp_shiftNum == 4 || temp_shiftNum == 6 || temp_shiftNum == 7 || temp_shiftNum == 8) pre_peep_night++;
+                }
+
+                // read require peep per shift
+                let total_peep_day = deShift(total_peep_perday[current_date-1], 'D');
+                let total_peep_even = deShift(total_peep_perday[current_date-1], 'E');
+                let total_peep_night = deShift(total_peep_perday[current_date-1], 'N');
+                
+                //console.log(pre_peep_day +', '+ pre_peep_even +', '+ pre_peep_night);
+
+                // create array of user added block
+                let isOri = [];
+                let temp_isOrigianl = [];
+                for (let i=0; i<isOriginal.length; i++) {
+                    if (isOriginal[i].split('_')[1] == current_date) temp_isOrigianl.push(Number(isOriginal[i].split('_')[0]));
+                }
+                for (let i=1; i<=total_peep; i++) {
+                    if (temp_isOrigianl.includes(i)) isOri.push(1);
+                    else isOri.push(0);
+                }
+
+                //console.log(isOri);
+                
+                // for each shift 0-D 1-E 2-N
+                for (let shift_time=0; shift_time<=2; shift_time++) {
+
+                    // read if data block was filled
+                    let isFill = [];
+                    for (let i=1; i<=total_peep; i++) {
+                        let temp_shiftNum = shiftNum(document.getElementById("disp_" + i + "_" + current_date).textContent);
+                        if (temp_shiftNum == 0) isFill.push(0);
+                        else isFill.push(1);
+                    }
+                
+                    // Day shift
+                    if (shift_time == 0) {
+
+                        // fill table
+                        let fill_count = pre_peep_day;
+
+                        if (fill_count < total_peep_day) {
+                            for (let i=1; i<=total_peep; i++) {
+                                if (night_shift[i-1] != 1 && isOri[i-1] != 1 && isFill[i-1] != 1) {
+                                    setValue('ช', 'disp_' + i + '_' + current_date);
+                                    fill_count++;
+                                }
+                                if (fill_count == total_peep_day) break;
+                                if (fill_count != total_peep_day && i == total_peep) { alert_pop('จำนวนคนไม่พอ วันที่ ' + current_date + ' เวรเช้า'); isCrash = true; }
+                            }
+                        }
+                    }
+
+                    // Evening shift
+                    else if (shift_time == 1) {
+
+                        // fill table
+                        let fill_count = pre_peep_even;
+
+                        if (fill_count < total_peep_even) {
+
+                            let isOverflow = false;
+
+                            // fill the blank block
+                            for (let i=1; i<=total_peep; i++) {
+                                if (isOri[i-1] != 1 && isFill[i-1] != 1) {
+                                    setValue('บ', 'disp_' + i + '_' + current_date);
+                                    fill_count++;
+                                }
+                                if (fill_count == total_peep_even) break;
+                                if (fill_count != total_peep_even && i == total_peep) isOverflow = true;
+                            }
+
+                            // add more shift to exiting peep
+                            if (isOverflow) {
+                                for (let i=1; i<=total_peep; i++) {
+                                    if (isOri[i-1] != 1) {
+                                        setValue('ช/บ', 'disp_' + i + '_' + current_date);
+                                        fill_count++;
+                                    }
+                                    if (fill_count == total_peep_even) break;
+                                    if (fill_count != total_peep_even && i == total_peep) { alert_pop('จำนวนคนไม่พอ วันที่ ' + current_date + ' เวรบ่าย'); isCrash = true; }
+                                }
+                            }
+                        }
+                    }
+
+                    // Night shift
+                    else if (shift_time == 2) {
+
+                        // fill table
+                        let fill_count = pre_peep_night;
+
+                        if (fill_count < total_peep_night) {
+
+                            let isOverflow_1 = false;
+                            let isOverflow_2 = false;
+
+                            // fill the blank block
+                            for (let i=1; i<=total_peep; i++) {
+                                if (isOri[i-1] != 1 && isFill[i-1] != 1) {
+                                    setValue('ด', 'disp_' + i + '_' + current_date);
+                                    fill_count++;
+                                }
+                                if (fill_count == total_peep_night) break;
+                                if (fill_count != total_peep_night && i == total_peep) isOverflow_1 = true;
+                            }
+
+                            // add more shift to exiting peep -> to even shift
+                            if (isOverflow_1) {
+                                for (let i=1; i<=total_peep; i++) {
+                                    let temp_shiftNum = shiftNum(document.getElementById("disp_" + i + "_" + current_date).textContent);
+                                    if (isOri[i-1] != 1 && temp_shiftNum == 3) {
+                                        setValue('บ/ด', 'disp_' + i + '_' + current_date);
+                                        fill_count++;
+                                    }
+                                    if (isOri[i-1] != 1 && temp_shiftNum == 2) {
+                                        setValue('ช/ด', 'disp_' + i + '_' + current_date);
+                                        fill_count++;
+                                    }
+                                    if (fill_count == total_peep_night) break;
+                                    if (fill_count != total_peep_night && i == total_peep) isOverflow_2 = true;
+                                }
+                            }
+
+                            // add more shift to exiting peep -> to day and even shift
+                            if (isOverflow_2) {
+                                for (let i=1; i<=total_peep; i++) {
+                                    let temp_shiftNum = shiftNum(document.getElementById("disp_" + i + "_" + current_date).textContent);
+                                    if (isOri[i-1] != 1 && temp_shiftNum == 5) {
+                                        setValue('All', 'disp_' + i + '_' + current_date);
+                                        fill_count++;
+                                    }
+                                    if (fill_count == total_peep_night) break;
+                                    if (fill_count != total_peep_night && i == total_peep) { alert_pop('จำนวนคนไม่พอ วันที่ ' + current_date + ' เวรดึก'); isCrash = true; }
+                                }
+                            }
+                        }
+                    }
+
+                    // check if crash
+                    if (isCrash) { clear_compute(); break; }
+                }
+                
+            }
+        }
+
+        // clear all data from compute
+        function clear_compute() {
+            for (let i=1; i<=total_peep; i++) {
+                for (let j=1; j<=total_date; j++) {
+                    let txt = i + '_' + j;
+                    if (!isOriginal.includes(txt)) setValue('', 'disp_' + txt);
+                }
+            }
+        }
+        function clear_all() {
+            for (let i=1; i<=total_peep; i++) {
+                for (let j=1; j<=total_date; j++) setValue('', 'disp_' + i + '_' + j);
+                document.getElementById('userCheck_' + i).checked = false;
+            }
+            isOriginal = [];
+        }
+        
+        // update minor setting
+        function minor_setting() {
+
+            // check if dont add more shift to these peep
+            for (let i=1; i<=total_peep; i++) {
+                for (let j=1; j<=total_date; j++) {
+                    let temp_txt = i + '_' + j;
+                    let isCheck = document.getElementById('userCheck_' + i).checked;
+                    let temp_shiftNum = shiftNum(document.getElementById("disp_" + i + "_" + j).textContent);
+                    if (isCheck) {
+                        if (!isOriginal.includes(temp_txt)) isOriginal.push(temp_txt);
+                        if (temp_shiftNum == 0) setValue('x', 'disp_' + temp_txt);
+                    } else {
+                        if (isOriginal.includes(temp_txt) && temp_shiftNum == 1) {
+                            isOriginal.splice(isOriginal.indexOf(temp_txt), 1);
+                            setValue('', 'disp_' + temp_txt);
+                        }
+                    }
+                }
+            }
+
+            // update tool-users lists
+            select_generate()
+        }
+        
+        // total shift per peep
+        function gen_total_shift() {
+
+            // clear old date
+            removeAllChildNodes(document.querySelector('#disp_total_shift'));
+
+            // for each peep
+            document.getElementById("disp_total_shift").innerHTML += '<div class="w3-bar"><div class="w3-bar-item" style="width:100px">รายชื่อ</div><div class="w3-bar-item" style="width:50px">รวม</div><div class="w3-bar-item" style="width:80px">เวรเช้า</div><div class="w3-bar-item" style="width:80px">เวรบ่าย</div><div class="w3-bar-item" style="width:80px">เวรดึก</div></div>';
+            for (let i=1; i<=total_peep; i++) {
+
+                // create data
+                let D_shift = 0;
+                let E_shift = 0;
+                let N_shift = 0;
+                for (let j=1; j<=total_date; j++) {
+                    let read_txt = document.getElementById('disp_' + i + '_' + j).textContent;
+                    if (shiftNum(read_txt) == 2 || shiftNum(read_txt) == 5 || shiftNum(read_txt) == 7 || shiftNum(read_txt) == 8) D_shift++;
+                    if (shiftNum(read_txt) == 3 || shiftNum(read_txt) == 5 || shiftNum(read_txt) == 6 || shiftNum(read_txt) == 8) E_shift++;
+                    if (shiftNum(read_txt) == 4 || shiftNum(read_txt) == 6 || shiftNum(read_txt) == 7 || shiftNum(read_txt) == 8) N_shift++;
+                }
+                let total_sihft = D_shift + E_shift + N_shift;
+
+                // display data
+                let temp_color = '<div class="w3-bar" ';
+                if (i%2 == 1) temp_color += 'style="background-color: #f1f1f1;"';
+                temp_color += '"><div class="w3-bar-item" style="width: 100px;">' + document.getElementById('disp_user_' + i).textContent + '</div><div class="w3-bar-item" style="width:50px">' + total_sihft + '</div><div class="w3-bar-item" style="width:80px">' + D_shift + '</div><div class="w3-bar-item" style="width:80px">' + E_shift + '</div><div class="w3-bar-item" style="width:80px">' + N_shift + '</div></div>';
+                document.getElementById("disp_total_shift").innerHTML += temp_color;
+
+            }
+        }
+
+        // tools
+        function tools_data() {
+            let selectUser  = document.getElementById("gen_sel_user").value;
+            let selectShift = document.getElementById("sel_shift").value;
+            let selectDate  = document.getElementById("sel_date").value;
+
+            //console.log(selectUser +', '+ selectShift +', '+ selectDate);
+
+            // loop for all date
+            for (i=1; i<=total_date; i++) {
+
+                // check if manual added or program generate
+                let txt = selectUser + '_' + i;
+
+                // check if holiday
+                if (selectDate == 0) {          // all days
+                    if (selectShift == 0) { setValue(numShift(0), "disp_" + txt); isOriginal.splice(isOriginal.indexOf(txt), 1); }
+                    else {
+                        if (!isOriginal.includes(txt)) { setValue(numShift(selectShift), "disp_" + txt); isOriginal.push(txt); }
+                    }
+                } else if (selectDate == 1) {   // work day
+                    if (!isHoliday.includes(i)) {
+                        if (selectShift == 0) { setValue(numShift(0), "disp_" + txt); isOriginal.splice(isOriginal.indexOf(txt), 1); }
+                        else {
+                            if (!isOriginal.includes(txt)) { setValue(numShift(selectShift), "disp_" + txt); isOriginal.push(txt); }
+                        }
+                    }
+                    
+                } else if (selectDate == 2) {   // holiday
+                    if (isHoliday.includes(i)) {
+                        if (selectShift == 0) { setValue(numShift(0), "disp_" + txt); isOriginal.splice(isOriginal.indexOf(txt), 1); }
+                        else {
+                            if (!isOriginal.includes(txt)) { setValue(numShift(selectShift), "disp_" + txt); isOriginal.push(txt); }
+                        }
+                    }
+                }
+            }
+        }
+
+        // Save, load CSV and print out
+        var rows = [];
+        function gen_dataArray() {
+
+            // clear data
+            rows = [];
+
+            // generate table
+            for (let i=1;i<=total_peep+1; i++) rows.push( [] );
+            for (let i=0;i<total_peep+1; i++) {
+                for (let j=0; j<=total_date; j++) rows[i].push(0);
+            }
+            for (let j=0; j<=total_date; j++) rows[0][j] = j;
+
+            // fill data
+            rows[0][0] = 'รายชื่อ';
+            for (let i=1; i<=total_peep; i++) {
+                rows[i][0] = document.getElementById('disp_user_' + i).textContent;
+                for (let j=1; j<=total_date; j++) rows[i][j] = document.getElementById('disp_' + i +'_'+ j).textContent;
+            }
+
+        }
+        function createTable(tableData, toObj) {
+            var table = document.createElement('table');
+            var tableBody = document.createElement('tbody');
+
+            table.style.width = '100%';
+            table.setAttribute('id', 'print_table');
+
+            tableData.forEach(function(rowData) {
+                var row = document.createElement('tr');
+
+                rowData.forEach(function(cellData) {
+                var cell = document.createElement('td');
+                cell.appendChild(document.createTextNode(cellData));
+                row.appendChild(cell);
+                });
+
+                tableBody.appendChild(row);
+            });
+
+            table.appendChild(tableBody);
+            document.getElementById(toObj).appendChild(table);
+        }
+        function save_file() {
+
+            gen_dataArray();
+            //console.log(rows);
+
+            // create file
+            let tab_name = document.getElementById('table_name').value;
+            let file_name = 'ตารางเวร';
+            if (tab_name != '') file_name = tab_name;
+            let csvContent = "data:text/csv;charset=utf-8," + rows.map(e => e.join(",")).join("\n");
+
+            var encodedUri = encodeURI(csvContent);
+            var link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", file_name + ".csv");
+            document.body.appendChild(link);
+
+            link.click();
+
+            
+        }
+        function open_file() {
+            alert('ยังใช้งานไม่ได้ :(');
+        }
+        function print_file() {
+
+            // clear old data
+            removeAllChildNodes(document.querySelector('#page_print'));
+
+            // table name
+            let tab_name = document.getElementById('table_name').value;
+            if (tab_name != '') document.getElementById('page_print').innerHTML += '<h1 style="margin-bottom: 20px">'+ tab_name + '</h1>';
+            
+            // generate table
+            gen_dataArray();
+            createTable(rows ,'page_print');
+            document.getElementById('page_print').innerHTML += '<div style="font-size: 10pt; margin-top: 10px">© 2022 TANPITCH. schedule generated</div>';
+
+            // highlight holiday
+            let x = document.getElementById("print_table").getElementsByTagName("td");
+            let row_header = [0];
+            let tab_row = document.getElementById("print_table").rows.length;
+            for (let i=1; i<tab_row; i++) { row_header.push(i*(total_date+1)); }
+
+            for (let j=0; j<isHoliday.length; j++) {   
+                for (let i=0; i<row_header.length; i++) {
+                    x[row_header[i]+isHoliday[j]].style.backgroundColor = "#e1e1e1";
+                }
+            }
+
+            // highlight manual insert data
+            for (let i=0; i<isOriginal.length; i++) {
+                x[ row_header[Number(isOriginal[i].split('_')[0])] + Number(isOriginal[i].split('_')[1]) ].style.backgroundColor = "#c5cc02";
+            }
+            
+            document.getElementById('page_disp').style.display = 'none';
+            document.getElementById('page_print').style.display = 'block';
+
+            window.print()
+        }
+
+    </script>
+</body>
+</html>
