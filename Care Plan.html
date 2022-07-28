@@ -3,6 +3,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bai+Jamjuree:wght@300&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/pretty-checkbox@3.0/dist/pretty-checkbox.min.css" rel="stylesheet">
 <head>
     <style>
     html,body,h1,h2,h3,h4,h5 {font-family: 'Bai Jamjuree', sans-serif}
@@ -20,6 +21,15 @@
     tr:first-child td { background-color: #e1e1e1; }
     td { width: 30px; }
     td:first-child { width: 100px; }
+
+    .inputfile {
+	width: 0.1px;
+	height: 0.1px;
+	opacity: 0;
+	overflow: hidden;
+	position: absolute;
+	z-index: -1;
+}
 
     </style>
 </head>
@@ -74,7 +84,8 @@
                     <span class="tooltiptext">บันทึกตารางเวร</span>
                 </div>
                 <div class="tooltip">
-                    <input type="button" value="เปิด" class="w3-button w3-light-grey" style="width: 100px;" onclick="open_file()" />
+                    <input type="file" name="file" id="csvFile" class="inputfile" />
+                    <label for="csvFile" class="w3-button w3-light-grey" style="width: 100px;" onclick="alert('This feature was crash')">เปิด</label>
                     <span class="tooltiptext">นำเข้าตารางเวร</span>
                 </div>
                 <div class="tooltip">
@@ -82,7 +93,7 @@
                     <span class="tooltiptext">พิมพ์ตารางเวร</span>
                 </div>
                 <div class="tooltip" style=" margin-left: 50px;">
-                    <input type="button" value="รวมจำนวนเวร" class="w3-button w3-light-grey" style="width: 200px;" onclick="document.getElementById('id08').style.display='block';gen_total_shift()" />
+                    <input type="button" value="รวมจำนวนเวร" class="w3-button w3-light-grey" style="width: 200px;" onclick="document.getElementById('id08').style.display='block';genTotal_shift()" />
                     <span class="tooltiptext">แสดงจำนวนเวรของแต่ละคน</span>
                 </div>
             </div>
@@ -100,12 +111,13 @@
         </div>
             
     </div>
-    <div id="page_print" style="display: none;" onclick="document.getElementById(this.id).style.display='none';document.getElementById('page_disp').style.display='block'"></div>
+    <div id="page_print" style="display: none;" onclick="document.getElementById(this.id).style.display='none';document.getElementById('page_disp').style.display='block'">
+    </div>
 
 
     <!-- People shift setting : Modal -->
     <div id="id01" class="w3-modal">
-        <div class="w3-modal-content" style="width: 500px; height: 180px;">
+        <div class="w3-modal-content" style="width: 500px; padding-bottom: 8px;">
           <header class="w3-container" style="background-color: pink;"> 
             <h3 style="margin: 0;" onclick="document.getElementById('id01').style.display='none'" 
             class="w3-button w3-display-topright">&times;</h3>
@@ -125,7 +137,7 @@
 
     <!-- Alert to Main setting : Modal -->
     <div id="id04" class="w3-modal">
-        <div class="w3-modal-content" style="width: 500px; height: 200px;">
+        <div class="w3-modal-content" style="width: 500px; padding-bottom: 8px;">
             <header class="w3-container" style="background-color: #cbf5ff;">
                 <h2>แจ้งเตือน</h2>
                 <h3 style="margin: 0;" onclick="document.getElementById('id04').style.display='none';" class="w3-button w3-display-topright">&times;</h3>
@@ -140,7 +152,7 @@
 
     <!-- Main setting : Modal -->
     <div id="id02" class="w3-modal">
-        <div class="w3-modal-content" style="width: 500px; height: 440px;">
+        <div class="w3-modal-content" style="width: 500px; padding-bottom: 8px;">
             <header class="w3-container" style="background-color: #cbf5ff;">
                 <h2>ตั้งค่าก่อนจัดเวร</h2>
             </header>
@@ -209,8 +221,17 @@
             </div>
             <div class="w3-container w3-border w3-padding-16 w3-margin">
                 <h4>ไม่จัดเวรเพิ่ม</h4>
-                <span>เปลี่ยนชื่อในช่อง เลือกหลังชื่อ จะไม่จัดเวรเพิ่มให้</span>
+                <span>เปลี่ยนชื่อในช่อง เลือกหน้าชื่อ จะไม่จัดเวรเพิ่มให้</span>
                 <div id="gen_user_setting" style="margin-top: 16px;"></div>
+            </div>
+            <div class="w3-container w3-border w3-padding-16 w3-margin">
+                <h4>เฉลี่ยเวร</h4>
+                <div class="pretty p-switch p-fill">
+                    <input type="checkbox" id="average_shift" checked />
+                    <div class="state">
+                        <label>เฉลี่ยจำนวนคนในแต่ละเวร</label>
+                    </div>
+                </div>
             </div>
             <div class="w3-container w3-margin w3-center">
                 <input type="button" value="ตกลง" onclick="document.getElementById('id05').style.display='none';minor_setting();" />
@@ -235,7 +256,7 @@
 
     <!-- Alert to Clear all data : Modal -->
     <div id="id06" class="w3-modal">
-        <div class="w3-modal-content" style="width: 500px; height: 200px;">
+        <div class="w3-modal-content" style="width: 500px; padding-bottom: 8px;">
             <header class="w3-container" style="background-color: #cbf5ff;">
                 <h2>แจ้งเตือน</h2>
                 <h3 style="margin: 0;" onclick="document.getElementById('id06').style.display='none';" class="w3-button w3-display-topright">&times;</h3>
@@ -250,7 +271,7 @@
 
     <!-- Sum all shift data : Modal -->
     <div id="id08" class="w3-modal">
-        <div class="w3-modal-content" style="width: 500px; padding-bottom: 10px;">
+        <div class="w3-modal-content" style="width: 500px; padding-bottom: 8px;">
             <header class="w3-container" style="background-color: pink;">
                 <h2>รวมจำนวนเวร</h2>
                 <h3 style="margin: 0;" onclick="document.getElementById('id08').style.display='none';" class="w3-button w3-display-topright">&times;</h3>
@@ -262,7 +283,7 @@
 
     <!-- Tools : Modal -->
     <div id="id07" class="w3-modal">
-        <div class="w3-modal-content" style="width: 500px; padding-bottom: 10px;">
+        <div class="w3-modal-content" style="width: 500px; padding-bottom: 8px;">
             <header class="w3-container" style="background-color: #cbf5ff;">
                 <h2>เครื่องมือ</h2>
                 <h3 style="margin: 0;" onclick="document.getElementById('id07').style.display='none';" class="w3-button w3-display-topright">&times;</h3>
@@ -282,8 +303,8 @@
     </div>
 
     <script>
-        var software_version = '1.1';
-        var software_date = '24/07/22';
+        var software_version = '1.3';
+        var software_date = '29/07/22';
 
         var total_peep = 10;
         var total_date = 31;
@@ -293,6 +314,7 @@
         var isHoliday = []; 
         var isOriginal = [];
         var isMenuOpen = false; var lastMenuOpen = '';
+        var peepShift = []; // [Peep 1] total, day, even, night -> [Peep 2] total, day, even, night
 
         // Display software version
         document.getElementById('soft_ver').innerHTML = 'software release version ' + software_version;
@@ -306,8 +328,7 @@
             document.getElementById('table_date_0').style.width = date_width + 'px';
         }
         
-        // TEST:
-        //update();
+        //update(); // DEBUG:
 
         function do_Nothing () {}
 
@@ -370,7 +391,7 @@
             for (let k=1; k<=total_peep; k++) {
                 let temp_row = '<div class="w3-bar"';
                 if (k%2 == 1) temp_row += ' style="background-color: #f1f1f1;"';
-                temp_row += '><div class="w3-bar-item w3-hover-black" style="padding: 8px" onclick="document.getElementById(\'id05\').style.display=\'block\'"><label id="disp_user_' + k + '" style="display: block; width: 84px;">User ' + k + '<label/></div><div id="gen_user_' + k + '"></div></div>';
+                temp_row += '><div class="w3-bar-item w3-hover-black" style="padding: 8px" onclick="document.getElementById(\'id05\').style.display=\'block\'"><label id="disp_user_' + k + '" style="display: block; width: 84px; height: 28.5px">User ' + k + '<label/></div><div id="gen_user_' + k + '"></div></div>';
                 document.getElementById("gen_user").innerHTML += temp_row;
             }
             for (let j=1; j<=total_peep; j++) {
@@ -382,7 +403,8 @@
 
             // User setting
             for (let j=1; j<=total_peep; j++) {
-                document.getElementById("gen_user_setting").innerHTML += '<div class="w3-third"><input style="width: 100px; margin: 4px 8px;" value="User ' + j + '" onchange="setValue(this.value, \'disp_user_' + j + '\')"/><input type="checkbox" id="userCheck_' + j + '"></div>';
+
+                document.getElementById("gen_user_setting").innerHTML += '<div class="w3-half"><div class="pretty p-switch p-fill"><input type="checkbox" id="userCheck_' + j + '" /><div class="state"><label></label></div></div><input id="input_disp_user_' + j + '" style="width: 160px; margin: 4px 8px;" value="User ' + j + '" onchange="setValue(this.value, \'disp_user_' + j + '\')"/>';
             }
             select_generate();
         }
@@ -415,6 +437,7 @@
                 isHoliday.push(cal_sunday - 1);
             }
             if (sunday_num == 7) {
+                isHoliday.push(0);
                 document.getElementById("table_date_0").style.backgroundColor = "pink";
                 for (let j=1; j<total_peep+1; j++) {
                     document.getElementById("date_" + j + "_" + "0").style.backgroundColor = "#e9d6d9";
@@ -476,18 +499,37 @@
         // Toggle shift menu
         function toggle_shift_menu(peep, date) {
             let temp_shift_menu = document.getElementById("shift_menu_" + peep + "_" + date);
-            if (!isMenuOpen) {
+            if (!isMenuOpen) {  // open drop down menu
                 lastMenuOpen = peep + "_" + date;
                 temp_shift_menu.style.display = 'block';
                 isMenuOpen = true;
-            } else {
+                document.getElementById("date_" + lastMenuOpen).style.color = "white";
+                document.getElementById("date_" + lastMenuOpen).style.backgroundColor = "black";
+            } else {    // close drop down menu
                 if (peep == Number(lastMenuOpen.split('_')[0]) && date == Number(lastMenuOpen.split('_')[1])) {
                     temp_shift_menu.style.display = 'none';
                     isMenuOpen = false;
-                } else {
+                    document.getElementById("date_" + lastMenuOpen).style.color = "black";
+                    let temp_block = document.getElementById("date_" + lastMenuOpen);
+                    temp_block.style.color = "black"
+                    if (isHoliday.includes(Number(lastMenuOpen.split('_')[1]))) temp_block.style.backgroundColor = "#E9D6D9";
+                    else {
+                        if (Number(lastMenuOpen.split('_')[0]) % 2 == 1) temp_block.style.backgroundColor = "#F1F1F1";
+                        else temp_block.style.backgroundColor = "white";
+                    }
+                } else {    // change selected block
                     document.getElementById("shift_menu_" + Number(lastMenuOpen.split('_')[0]) + "_" + Number(lastMenuOpen.split('_')[1])).style.display = 'none';
                     temp_shift_menu.style.display = 'block';
+                    let temp_block = document.getElementById("date_" + lastMenuOpen);
+                    temp_block.style.color = "black"
+                    if (isHoliday.includes(Number(lastMenuOpen.split('_')[1]))) temp_block.style.backgroundColor = "#E9D6D9";
+                    else {
+                        if (Number(lastMenuOpen.split('_')[0]) % 2 == 1) temp_block.style.backgroundColor = "#F1F1F1";
+                        else temp_block.style.backgroundColor = "white";
+                    }
                     lastMenuOpen = peep + "_" + date;
+                    document.getElementById("date_" + lastMenuOpen).style.color = "white";
+                    document.getElementById("date_" + lastMenuOpen).style.backgroundColor = "black";
                 }
             }
             
@@ -569,8 +611,23 @@
             return Number(100 * valD) + Number(10 * valE) + Number(valN);
         }
 
+        // Sort array -> return in array of index
+        function sort_index(arr, sort_axis = 'lowTohigh') {
+            let arr_index = [];
+            let arr_sort = (sort_axis == 'lowTohigh') ? arr.slice().sort((a, b) => a - b) : arr.slice().sort((a, b) => b - a);
+            let repeat_count = 1;
+            for (let a=0; a<arr.length; a++) {
+                if (a != 0 && arr_sort[a] == arr_sort[a-1]) arr_index.push(arr.indexOf(arr_sort[a], arr_index[arr_index.length-1] + 1));
+                else arr_index.push(arr.indexOf(arr_sort[a]));
+            }  
+            return arr_index;
+        }
+
         // Processing
         function main_process() {
+
+            //clear_compute(); // DEBUG:
+            //console.clear(); // DEBUG:
             
             let isCrash = false;
 
@@ -627,16 +684,37 @@
                         else isFill.push(1);
                     }
                 
+                    
                     // Day shift
                     if (shift_time == 0) {
-
+                        
                         // fill table
                         let fill_count = pre_peep_day;
-
+                        
                         if (fill_count < total_peep_day) {
+                            
+                            let shift_i = 0;
+                            let fill_order = [];
                             for (let i=1; i<=total_peep; i++) {
-                                if (night_shift[i-1] != 1 && isOri[i-1] != 1 && isFill[i-1] != 1) {
-                                    setValue('ช', 'disp_' + i + '_' + current_date);
+                                
+                                // Random start peep -> random number - only day 1, others start from lowest shifted peep
+                                if (current_date == 1 && i == 1) shift_i = Math.floor(Math.random()*total_peep);
+                                if (current_date != 1 && i == 1) { 
+                                    // Find peep filling order
+                                    dataTotal_shift();
+                                    let temp_D = []; for (let k=1; k<=peepShift.length; k++) if (k%4==1) temp_D.push(peepShift[k]);
+                                    fill_order = sort_index(temp_D);
+                                }
+                                
+                                // Find start peep
+                                let result_i = (shift_i + i <= total_peep) ? shift_i + i : shift_i + i - total_peep;
+
+                                // Average shift count for each peep - Feature PASS:
+                                if (document.getElementById('average_shift').checked) { if (current_date != 1) result_i = fill_order[i-1] + 1; }
+                                
+                                if (night_shift[result_i-1] != 1 && isOri[result_i-1] != 1 && isFill[result_i-1] != 1) {
+                                    
+                                    setValue('ช', 'disp_' + result_i + '_' + current_date);
                                     fill_count++;
                                 }
                                 if (fill_count == total_peep_day) break;
@@ -657,8 +735,15 @@
 
                             // fill the blank block
                             for (let i=1; i<=total_peep; i++) {
-                                if (isOri[i-1] != 1 && isFill[i-1] != 1) {
-                                    setValue('บ', 'disp_' + i + '_' + current_date);
+
+                                // average the shift PASS:
+                                dataTotal_shift();
+                                let temp_E = []; for (let k=1; k<=peepShift.length; k++) if (k%4==2) temp_E.push(peepShift[k]);
+                                fill_order = sort_index(temp_E);
+                                let result_i = (document.getElementById('average_shift').checked) ? fill_order[i-1] + 1 : i;
+
+                                if (isOri[result_i-1] != 1 && isFill[result_i-1] != 1) {
+                                    setValue('บ', 'disp_' + result_i + '_' + current_date);
                                     fill_count++;
                                 }
                                 if (fill_count == total_peep_even) break;
@@ -692,6 +777,13 @@
 
                             // fill the blank block
                             for (let i=1; i<=total_peep; i++) {
+
+                                // average the shift PASS:
+                                dataTotal_shift();
+                                let temp_N = []; for (let k=1; k<=peepShift.length; k++) if (k%4==3) temp_N.push(peepShift[k]);
+                                fill_order = sort_index(temp_N);
+                                let result_i = (document.getElementById('average_shift').checked) ? fill_order[i-1] + 1 : i;
+
                                 if (isOri[i-1] != 1 && isFill[i-1] != 1) {
                                     setValue('ด', 'disp_' + i + '_' + current_date);
                                     fill_count++;
@@ -782,13 +874,12 @@
         }
         
         // total shift per peep
-        function gen_total_shift() {
+        function dataTotal_shift () {
 
-            // clear old date
-            removeAllChildNodes(document.querySelector('#disp_total_shift'));
+            // clear array
+            peepShift = [];
 
-            // for each peep
-            document.getElementById("disp_total_shift").innerHTML += '<div class="w3-bar"><div class="w3-bar-item" style="width:100px">รายชื่อ</div><div class="w3-bar-item" style="width:50px">รวม</div><div class="w3-bar-item" style="width:80px">เวรเช้า</div><div class="w3-bar-item" style="width:80px">เวรบ่าย</div><div class="w3-bar-item" style="width:80px">เวรดึก</div></div>';
+            // read through every peep
             for (let i=1; i<=total_peep; i++) {
 
                 // create data
@@ -801,12 +892,32 @@
                     if (shiftNum(read_txt) == 3 || shiftNum(read_txt) == 5 || shiftNum(read_txt) == 6 || shiftNum(read_txt) == 8) E_shift++;
                     if (shiftNum(read_txt) == 4 || shiftNum(read_txt) == 6 || shiftNum(read_txt) == 7 || shiftNum(read_txt) == 8) N_shift++;
                 }
-                let total_sihft = D_shift + E_shift + N_shift;
+                let total_shift = D_shift + E_shift + N_shift;
+
+                peepShift.push(total_shift, D_shift, E_shift, N_shift);
+
+            }
+        }
+        function genTotal_shift() {
+
+            // clear old date
+            removeAllChildNodes(document.querySelector('#disp_total_shift'));
+
+            // for each peep
+            document.getElementById("disp_total_shift").innerHTML += '<div class="w3-bar"><div class="w3-bar-item" style="width:100px">รายชื่อ</div><div class="w3-bar-item" style="width:50px">รวม</div><div class="w3-bar-item" style="width:80px">เวรเช้า</div><div class="w3-bar-item" style="width:80px">เวรบ่าย</div><div class="w3-bar-item" style="width:80px">เวรดึก</div></div>';
+            for (let i=1; i<=total_peep; i++) {
+
+                // create data
+                dataTotal_shift();
+                let disp_total = peepShift[4*(i-1)];
+                let disp_D = peepShift[(4*(i-1))+1];
+                let disp_E = peepShift[(4*(i-1))+2];
+                let disp_N = peepShift[(4*(i-1))+3];
 
                 // display data
                 let temp_color = '<div class="w3-bar" ';
                 if (i%2 == 1) temp_color += 'style="background-color: #f1f1f1;"';
-                temp_color += '"><div class="w3-bar-item" style="width: 100px;">' + document.getElementById('disp_user_' + i).textContent + '</div><div class="w3-bar-item" style="width:50px">' + total_sihft + '</div><div class="w3-bar-item" style="width:80px">' + D_shift + '</div><div class="w3-bar-item" style="width:80px">' + E_shift + '</div><div class="w3-bar-item" style="width:80px">' + N_shift + '</div></div>';
+                temp_color += '"><div class="w3-bar-item" style="width: 100px;">' + document.getElementById('disp_user_' + i).textContent + '</div><div class="w3-bar-item" style="width:50px">' + disp_total + '</div><div class="w3-bar-item" style="width:80px">' + disp_D + '</div><div class="w3-bar-item" style="width:80px">' + disp_E + '</div><div class="w3-bar-item" style="width:80px">' + disp_N + '</div></div>';
                 document.getElementById("disp_total_shift").innerHTML += temp_color;
 
             }
@@ -851,27 +962,89 @@
             }
         }
 
-        // Save, load CSV and print out
+        // load CSV function
+        let CSVread = '';
+        const input = document.querySelector('#csvFile')
+        const fileReader = new FileReader()
+        fileReader.onload = (e) => { CSVread = e.target.result; csvToArray(CSVread); }
+        input.onchange = (e) => {
+            const [file] = e.target.files;
+            fileReader.readAsText(file);
+        }
+        function csvToArray(str, delimiter = ",") {
+            let preDisp_arr = str.split(delimiter);
+
+            // set backend setup
+            let temp_total_peep = 1;
+            for (let i=0; i<preDisp_arr.length; i++) {
+                if (preDisp_arr[i].indexOf('\n') != -1) {
+                    if (temp_total_peep == 1) {
+                        total_date = Number(i - 1);
+                        document.getElementById("total_date").value = Number(i - 1);
+                    }
+                    temp_total_peep++;
+                }
+            }
+            total_peep = temp_total_peep - 4;
+            document.getElementById("total_peep").value = total_peep;
+            document.getElementById("sunday_date").value = preDisp_arr[((total_peep+1)*(total_date+1))].split('\n')[1];
+            document.getElementById("holiday_date").value = preDisp_arr[((total_peep+1)*(total_date+1))+1].split("-").join(",");
+            document.getElementById("table_name").value = preDisp_arr[((total_peep+2)*(total_date+1))].split('\n')[1];
+            document.getElementById("average_shift").checked = (preDisp_arr[((total_peep+2)*(total_date+1))+1] == 1) ? true : false;
+            console.log( preDisp_arr[((1)*(total_date+1))+1] );
+            
+            update();
+            
+            // fill loop data
+            let temp_toggle = preDisp_arr[((total_peep+2)*(total_date+1))+2].split("");
+            for (let i=1; i<=total_peep; i++) {
+                for (let k=1; k<=total_date; k++) document.getElementById("disp_" + i + "_" + k).innerHTML = preDisp_arr[((i)*(total_date+1))+k];
+                if (i==1) { for (let j=1; j<=total_date; j++) total_peep_perday[j-1] = preDisp_arr[((total_peep+1)*(total_date+1))+1+j]; }
+                document.getElementById("disp_user_" + i).innerHTML =  preDisp_arr[(i*(total_date+1))].split('\n')[1];
+                document.getElementById("input_disp_user_" + i).value =  preDisp_arr[(i*(total_date+1))].split('\n')[1];
+                document.getElementById("userCheck_" + i).checked = (temp_toggle[i-1] == 1) ? true : false;
+            }
+
+            minor_setting();
+
+        }
+
+        // Save and print out
         var rows = [];
-        function gen_dataArray() {
+        function gen_dataArray(isPrint = false) {
 
             // clear data
             rows = [];
 
             // generate table
-            for (let i=1;i<=total_peep+1; i++) rows.push( [] );
+            let tempNum = (isPrint) ? 1 : 3;
+            for (let i=1;i<=total_peep+tempNum; i++) rows.push( [] );
             for (let i=0;i<total_peep+1; i++) {
                 for (let j=0; j<=total_date; j++) rows[i].push(0);
             }
-            for (let j=0; j<=total_date; j++) rows[0][j] = j;
+            for (let j=0; j<=total_date; j++) if(!isPrint) rows[0][j+1] = j; else rows[0][j] = j;
 
             // fill data
             rows[0][0] = 'รายชื่อ';
+            let block_shift_txt = '';
             for (let i=1; i<=total_peep; i++) {
+                block_shift_txt += (document.getElementById("userCheck_" + i).checked) ? 1 : 0;
                 rows[i][0] = document.getElementById('disp_user_' + i).textContent;
-                for (let j=1; j<=total_date; j++) rows[i][j] = document.getElementById('disp_' + i +'_'+ j).textContent;
+                for (let j=0; j<=total_date; j++) {
+                    if (!isPrint) {
+                        rows[i][j+1] = document.getElementById('disp_' + i +'_'+ j).textContent;
+                        rows[total_peep+1][j+1] = total_peep_perday[j-1];
+                    } else { if (j != 0) rows[i][j] = document.getElementById('disp_' + i +'_'+ j).textContent; }
+                }
             }
-
+            if (!isPrint) {
+                rows[total_peep+1][0] = document.getElementById("sunday_date").value;
+                rows[total_peep+1][1] = document.getElementById("holiday_date").value.replace(/\s/g, "").split(",");
+                rows[total_peep+2][0] = document.getElementById("table_name").value;
+                rows[total_peep+2][1] = (document.getElementById("average_shift").checked) ? 1 : 0;
+                rows[total_peep+2][2] = block_shift_txt;
+            }
+            
         }
         function createTable(tableData, toObj) {
             var table = document.createElement('table');
@@ -898,7 +1071,6 @@
         function save_file() {
 
             gen_dataArray();
-            //console.log(rows);
 
             // create file
             let tab_name = document.getElementById('table_name').value;
@@ -913,11 +1085,7 @@
             document.body.appendChild(link);
 
             link.click();
-
             
-        }
-        function open_file() {
-            alert('ยังใช้งานไม่ได้ :(');
         }
         function print_file() {
 
@@ -929,9 +1097,9 @@
             if (tab_name != '') document.getElementById('page_print').innerHTML += '<h1 style="margin-bottom: 20px">'+ tab_name + '</h1>';
             
             // generate table
-            gen_dataArray();
+            gen_dataArray(true);
             createTable(rows ,'page_print');
-            document.getElementById('page_print').innerHTML += '<div style="font-size: 10pt; margin-top: 10px">© 2022 TANPITCH. schedule generated</div>';
+            document.getElementById('page_print').innerHTML += '<div class="tooltip"><div style="font-size: 10pt; margin-top: 10px">© 2022 TANPITCH. schedule generated</div><span class="tooltiptext">คลิกที่ตาราง เพื่อย้อนกลับ</span></div>';
 
             // highlight holiday
             let x = document.getElementById("print_table").getElementsByTagName("td");
