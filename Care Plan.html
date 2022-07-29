@@ -22,14 +22,7 @@
     td { width: 30px; }
     td:first-child { width: 100px; }
 
-    .inputfile {
-	width: 0.1px;
-	height: 0.1px;
-	opacity: 0;
-	overflow: hidden;
-	position: absolute;
-	z-index: -1;
-}
+    .inputfile { width: 0.1px; height: 0.1px; opacity: 0; overflow: hidden; position: absolute; z-index: -1; }
 
     </style>
 </head>
@@ -85,7 +78,7 @@
                 </div>
                 <div class="tooltip">
                     <input type="file" name="file" id="csvFile" class="inputfile" />
-                    <label for="csvFile" class="w3-button w3-light-grey" style="width: 100px;" onclick="alert('This feature was crash')">เปิด</label>
+                    <label for="csvFile" class="w3-button w3-light-grey" style="width: 100px;">เปิด</label>
                     <span class="tooltiptext">นำเข้าตารางเวร</span>
                 </div>
                 <div class="tooltip">
@@ -121,7 +114,7 @@
           <header class="w3-container" style="background-color: pink;"> 
             <h3 style="margin: 0;" onclick="document.getElementById('id01').style.display='none'" 
             class="w3-button w3-display-topright">&times;</h3>
-            <h2>จำนวนคนต่อเวร : <label id="disp_date">31</label></h2>
+            <h2>จำนวนคนต่อเวร : <label id="disp_date"></label></h2>
           </header>
           <div class="w3-container w3-margin">
             <span style="display: inline-block; width: 60px; margin: 8px;"> เวรเช้า : </span><input type="number" min="1" max="7" value="4" style="margin-right: 20px;" id="disp_total_day" />
@@ -129,8 +122,8 @@
             <span style="display: inline-block; width: 60px; margin: 8px;"> เวรดึก : </span><input type="number" min="1" max="7" value="3" id="disp_total_night" />
           </div>
           <div class="w3-container w3-margin w3-center">
-            <input type="button" value="บันทึก" onclick="set_total();document.getElementById('id01').style.display='none'" />
-            <input type="button" value="ยกเลิก" onclick="document.getElementById('id01').style.display='none'" />
+            <input type="button" value="บันทึก" onclick="set_total(); document.getElementById('id01').style.display='none';peep_clear();" />
+            <input type="button" value="ยกเลิก" onclick="document.getElementById('id01').style.display='none';peep_clear();" />
           </div>
         </div>
     </div>
@@ -187,8 +180,8 @@
             <div class="w3-container">
                 <h4 id="home_ver"></h4>
                 <li id="home_date"></li>
-                <li>many bugs fixed</li>
-                <li>some features may not working</li>
+                <li>all features are working</li>
+                <li>bugs fixed</li>
             </div>
             <div class="w3-container" style="font-size: 8pt;">
                 <p>© 2022 TANPITCH</p>
@@ -384,7 +377,7 @@
 
             // Header
             for (let i=1; i<=total_date; i++) {
-                document.getElementById("gen_date").innerHTML += '<div class="w3-bar-item w3-hover-black" style="width: ' + date_width + 'px;padding: 8px 4px; text-align: center;" id="table_date_' + i + '" onclick="peep_set(' + i + ')">' + i + '</div>';
+                document.getElementById("gen_date").innerHTML += '<div class="w3-bar-item w3-hover-black" style="width: ' + date_width + 'px;padding: 8px 4px; text-align: center;" id="table_date_' + i + '" onclick="peep_set(' + i + ');reg_block_num=' + i + '">' + i + '</div>';
             }
             
             // User
@@ -480,7 +473,12 @@
         }
     
         // Set people per shift
+        let reg_block_num = 0;
         function peep_set(block_num) {
+
+            // highlight block
+            document.getElementById("table_date_" + block_num).style.color = "white";
+            document.getElementById("table_date_" + block_num).style.backgroundColor = "black";
 
             // load data
             document.getElementById("disp_total_day").value = deShift(total_peep_perday[block_num-1], 'D');
@@ -490,6 +488,12 @@
             // display modal
             document.getElementById('disp_date').innerHTML = block_num;
             document.getElementById('id01').style.display='block';
+        }
+        function peep_clear() {
+            let bg_color = document.getElementById("table_date_" + reg_block_num);
+            if (isHoliday.includes(reg_block_num)) bg_color.style.backgroundColor = "pink";
+            else bg_color.style.backgroundColor = "white";
+            document.getElementById("table_date_" + reg_block_num).style.color = "black";
         }
         function set_total() {
             let block_num = document.getElementById('disp_date').textContent - 1;
@@ -633,7 +637,7 @@
 
             // for each day
             for (let current_date=1; current_date<=total_date; current_date++) {
-
+            
                 // check previous night shift
                 let night_shift = [];
                 for (let i=1; i<=total_peep; i++) {
@@ -674,7 +678,7 @@
                 //console.log(isOri);
                 
                 // for each shift 0-D 1-E 2-N
-                for (let shift_time=0; shift_time<=2; shift_time++) {
+                for (let shift_time=0; shift_time<=3; shift_time++) {
 
                     // read if data block was filled
                     let isFill = [];
@@ -824,6 +828,11 @@
                         }
                     }
 
+                    // Fill the blank cell
+                    else if (shift_time == 3) {
+                        for (let i=1; i<=total_peep; i++) { if (isOri[i-1] != 1 && isFill[i-1] != 1) { setValue('x', 'disp_' + i + '_' + current_date); }}
+                    }
+
                     // check if crash
                     if (isCrash) { clear_compute(); break; }
                 }
@@ -971,38 +980,41 @@
             const [file] = e.target.files;
             fileReader.readAsText(file);
         }
-        function csvToArray(str, delimiter = ",") {
+        function csvToArray(str, delimiter = /[\n,]+/g) {
             let preDisp_arr = str.split(delimiter);
 
             // set backend setup
+            let date_peep_arr = str.split(",");
             let temp_total_peep = 1;
-            for (let i=0; i<preDisp_arr.length; i++) {
-                if (preDisp_arr[i].indexOf('\n') != -1) {
+            for (let i=0; i<date_peep_arr.length; i++) {
+                if (date_peep_arr[i].includes('\n')) {
                     if (temp_total_peep == 1) {
                         total_date = Number(i - 1);
-                        document.getElementById("total_date").value = Number(i - 1);
+                        document.getElementById("total_date").value = total_date;
                     }
                     temp_total_peep++;
                 }
             }
-            total_peep = temp_total_peep - 4;
+            total_peep = temp_total_peep - 3;
+            
             document.getElementById("total_peep").value = total_peep;
-            document.getElementById("sunday_date").value = preDisp_arr[((total_peep+1)*(total_date+1))].split('\n')[1];
-            document.getElementById("holiday_date").value = preDisp_arr[((total_peep+1)*(total_date+1))+1].split("-").join(",");
-            document.getElementById("table_name").value = preDisp_arr[((total_peep+2)*(total_date+1))].split('\n')[1];
-            document.getElementById("average_shift").checked = (preDisp_arr[((total_peep+2)*(total_date+1))+1] == 1) ? true : false;
-            console.log( preDisp_arr[((1)*(total_date+1))+1] );
-            
+            document.getElementById("sunday_date").value = preDisp_arr[((total_peep+1)*(total_date+2))];
+            document.getElementById("holiday_date").value = preDisp_arr[((total_peep+1)*(total_date+2))+1].split("-").join(",");
+            document.getElementById("table_name").value = preDisp_arr[((total_peep+2)*(total_date+2))];
+            document.getElementById("average_shift").checked = ( preDisp_arr[((total_peep+2)*(total_date+2))+1] == 1) ? true : false;
+
             update();
-            
+
             // fill loop data
-            let temp_toggle = preDisp_arr[((total_peep+2)*(total_date+1))+2].split("");
+            let temp_toggle = preDisp_arr[((total_peep+2)*(total_date+2))+2].split("");
             for (let i=1; i<=total_peep; i++) {
-                for (let k=1; k<=total_date; k++) document.getElementById("disp_" + i + "_" + k).innerHTML = preDisp_arr[((i)*(total_date+1))+k];
-                if (i==1) { for (let j=1; j<=total_date; j++) total_peep_perday[j-1] = preDisp_arr[((total_peep+1)*(total_date+1))+1+j]; }
-                document.getElementById("disp_user_" + i).innerHTML =  preDisp_arr[(i*(total_date+1))].split('\n')[1];
-                document.getElementById("input_disp_user_" + i).value =  preDisp_arr[(i*(total_date+1))].split('\n')[1];
+                for (let k=0; k<=total_date; k++) document.getElementById("disp_" + i + "_" + k).innerHTML = preDisp_arr[(i*(total_date+2))+k+1];
+                document.getElementById("disp_user_" + i).innerHTML =  preDisp_arr[(i*(total_date+2))];
+                document.getElementById("input_disp_user_" + i).value =  preDisp_arr[(i*(total_date+2))];
                 document.getElementById("userCheck_" + i).checked = (temp_toggle[i-1] == 1) ? true : false;
+            }
+            for (let j=0; j<=total_date; j++) {
+                total_peep_perday[j] = Number(preDisp_arr[((total_peep+1)*(total_date+2))+2+j]);
             }
 
             minor_setting();
@@ -1024,6 +1036,8 @@
             }
             for (let j=0; j<=total_date; j++) if(!isPrint) rows[0][j+1] = j; else rows[0][j] = j;
 
+            //console.log(total_peep_perday);
+
             // fill data
             rows[0][0] = 'รายชื่อ';
             let block_shift_txt = '';
@@ -1033,17 +1047,19 @@
                 for (let j=0; j<=total_date; j++) {
                     if (!isPrint) {
                         rows[i][j+1] = document.getElementById('disp_' + i +'_'+ j).textContent;
-                        rows[total_peep+1][j+1] = total_peep_perday[j-1];
+                        if(j!=total_date) rows[total_peep+1][j+2] = total_peep_perday[j];
                     } else { if (j != 0) rows[i][j] = document.getElementById('disp_' + i +'_'+ j).textContent; }
                 }
             }
             if (!isPrint) {
                 rows[total_peep+1][0] = document.getElementById("sunday_date").value;
-                rows[total_peep+1][1] = document.getElementById("holiday_date").value.replace(/\s/g, "").split(",");
+                rows[total_peep+1][1] = document.getElementById("holiday_date").value.replace(/\s/g, "").split(",").join("-");
                 rows[total_peep+2][0] = document.getElementById("table_name").value;
                 rows[total_peep+2][1] = (document.getElementById("average_shift").checked) ? 1 : 0;
                 rows[total_peep+2][2] = block_shift_txt;
             }
+
+            //console.log(rows);
             
         }
         function createTable(tableData, toObj) {
